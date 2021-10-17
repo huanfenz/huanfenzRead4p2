@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+
+    <LinearLayout
+        android:id="@+id/dashboard_item"
+        android:layout_width="105dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
+
+        <com.example.wangpeng.huanfenzread.view.MyImageView
+            android:id="@+id/dashboard_item_image"
+            android:layout_width="105dp"
+            android:layout_height="140dp"
+            android:layout_weight="1"
+            android:elevation="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/beijing" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:id="@+id/dashboard_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="@string/app_name"
+            android:textColor="#014559"
+            android:textSize="16dp" />
+    </LinearLayout>
+</RelativeLayout>
