@@ -41,16 +41,22 @@ public class MainActivity extends AppCompatActivity {
         //向用户请求本地存储读写权限
         PermisionUtils.verifyStoragePermissions(this);
 
-        String path = this.getExternalFilesDir("").getPath();
+        // 获取当前软件的files目录
+        String path = this.getExternalFilesDir("").getPath();   ///storage/emulated/0/Android/data/com.example.wangpeng.huanfenzread/files
+        // 根目录定义
         MyDataUtils.basePath = path;
+        // 书架目录定义
         MyDataUtils.shelfSolderPath = MyDataUtils.basePath+"/shelf";
+        // 书架信息目录定义
         MyDataUtils.shelfInformationFilePath = MyDataUtils.basePath+"/shelf/inf.text";
+        // 设置目录定义
         MyDataUtils.settingsPath = MyDataUtils.basePath+"/shelf/settings.text";
+        // 图片目录定义
         MyDataUtils.picSolerPath = MyDataUtils.basePath+"/shelf/picture";
 
-        //数据获取
+        //从本地获取设置信息
         MyDataUtils.getSettings();
-        if(mySettings == null)mySettings = new MySettings(19,2);
+        if(mySettings == null) mySettings = new MySettings(19,2);
 
         //底部菜单显示
         BottomBarView bottomBar = findViewById(R.id.bottom_bar);
@@ -67,12 +73,12 @@ public class MainActivity extends AppCompatActivity {
                 .build();
     }
 
+    //跳回界面的回调
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(resultCode){
             case Activity.RESULT_OK://该结果码要与Fragment中的一致
-                //我这里使用的是根据结果码获取数据，然后加上下面一句代码，其
-                //他的什么都不用做
+                //我这里使用的是根据结果码获取数据，然后加上下面一句代码，其他的什么都不用做
                 super.onActivityResult(requestCode,resultCode,data);
                 break;
         }

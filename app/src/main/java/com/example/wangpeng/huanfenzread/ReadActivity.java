@@ -45,18 +45,14 @@ import static com.example.wangpeng.huanfenzread.FragShelfActivity.shelfList;
 public class ReadActivity extends AppCompatActivity {
 
     //控件对象
-    private JustifyTextView text;
-    private TextView title,page,tv_fontSize,name,tv_time;
-    private LinearLayout lin_menu,lin_body,lin_setting,lin_top,lin_bottom;
-    private EditText et_addr;
-
-    private LoadingView loading;
-
-    //状态栏高度
-    private int statusBarHeight = 20;
+    private JustifyTextView text;   // 阅读文本
+    private TextView title,page,tv_fontSize,name,tv_time;   // 标题、页、字号、名字、时间
+    private LinearLayout lin_menu,lin_body,lin_setting,lin_top,lin_bottom;  // 菜单、主体、设置、顶部、底部
+    private EditText et_addr;   // 地址输入
+    private LoadingView loading;    // 加载
 
     //内容web的全部内容
-    private String webStr = null;
+    private String webStr = null;   // web的全部内容
 
     //坐标变量
     private float mPosX,mCurPosX,mCurPosY,maxHeight,maxWidth;
@@ -72,7 +68,7 @@ public class ReadActivity extends AppCompatActivity {
     private int maxPage = 1;
     //最大章节
     private int maxChapter = 1;
-
+    //目标页
     int targetPage = 1;
 
     //目录地址和章节地址
@@ -82,10 +78,10 @@ public class ReadActivity extends AppCompatActivity {
     //handler
     private Handler handler;
 
-    private int readMode=2;//默认是2，表示临时模式
+    private int readMode = 2; //默认是2，表示临时模式
     private int shelfIndex = 0;
 
-    @SuppressLint({"ClickableViewAccessibility", "HandlerLeak", "WrongViewCast"})
+    @SuppressLint({"ClickableViewAccessibility", "HandlerLeak", "WrongViewCast", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +115,8 @@ public class ReadActivity extends AppCompatActivity {
         loading = new LoadingView(ReadActivity.this,R.style.CustomDialog);
 
         //获取状态栏高度
-        statusBarHeight = getStatusBarHeight(this);
+        //状态栏高度
+        int statusBarHeight = getStatusBarHeight(this);
         //测量lin_top的height
         lin_top.measure(0, 0);
         int height = lin_top.getMeasuredHeight();
@@ -137,6 +134,7 @@ public class ReadActivity extends AppCompatActivity {
         //设置字体大小
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,MainActivity.mySettings.fontSize);
         tv_fontSize.setText(MainActivity.mySettings.fontSize+"");
+
         //设置背景
         setBackground(MainActivity.mySettings.backColor);
 
@@ -144,32 +142,32 @@ public class ReadActivity extends AppCompatActivity {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         maxHeight = dm.heightPixels;
         maxWidth = dm.widthPixels;
+        Log.d("DisplayMetrics","size：" + maxHeight + " " + maxWidth);
 
-        int cpt=1,tpg=1;
-        String tstr,str="";
+        int cpt=1, tpg=1;
+        String tstr, str="";
 
         Intent intent = getIntent();
         tstr = intent.getStringExtra("read_url");
         shelfIndex = intent.getIntExtra("shelf_index",9999);
         readMode = intent.getIntExtra("shelf_mode",2);
 
-
         //如果是书架本地模式
-        if(readMode==0){
-            Log.d("TestFile","readMode:"+readMode);
+        if(readMode == 0){
+            Log.d("TestFile","readMode:" + readMode);
             MyDataUtils.curChapter = cpt = shelfList.get(shelfIndex).curChapter;
             curPage = MyDataUtils.curPage = tpg = shelfList.get(shelfIndex).curPage;
             maxChapter = shelfList.get(shelfIndex).catalogs.length;
         }
         //如果是书架网络模式
-        else if(readMode==1){
+        else if(readMode == 1){
             MyDataUtils.curChapter = cpt = shelfList.get(shelfIndex).curChapter;
             curPage = MyDataUtils.curPage = tpg = shelfList.get(shelfIndex).curPage;
             str = shelfList.get(shelfIndex).readAddr;
             //Log.d("ReadActivity",cpt + "\t" + tpg  + "\t"  + str + "");
         }
         //如果是临时模式
-        else if(readMode==2){
+        else if(readMode == 2){
             cpt = MyDataUtils.curChapter;
             //目标页等于当前页
             tpg = MyDataUtils.curPage;
@@ -186,67 +184,52 @@ public class ReadActivity extends AppCompatActivity {
             TxtGet();
         }
 
-
-        text.setOnTouchListener(new View.OnTouchListener() {
+        //监听触摸事件
+        lin_body.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_DOWN:   // 按下获取x坐标
                         mPosX = motionEvent.getX();
+                        Log.d("PushMessage","原x坐标是：" + mPosX);
                         break;
-                    case MotionEvent.ACTION_MOVE:
+                    case MotionEvent.ACTION_UP: // 抬起获取(x,y)坐标
                         mCurPosX = motionEvent.getX();
                         mCurPosY = motionEvent.getY();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        //Log.d("PushMid","最大坐标：" + maxWidth + " " + maxHeight);
-                        //Log.d("PushMid","当前坐标为：" + mCurPosX + " " + mCurPosY);
+                        Log.d("PushMessage","当前坐标为：" + mCurPosX + " " + mCurPosY);
 
                         //如果菜单开启，那么关闭
                         if(lin_menu.getVisibility() == View.VISIBLE){
-                            closeMenu();
+                            //隐藏状态栏
+                            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                            closeMenu();    //关闭菜单
                         } else if (mCurPosX - mPosX > 0 && (Math.abs(mCurPosX - mPosX) > 100)) {
-                            //上一页
-                            lastPage();
+                            lastPage(); //上一页
                         } else if (mCurPosX - mPosX < 0 && (Math.abs(mCurPosX - mPosX) > 100)) {
-                            //下一页
-                            nextPage();
-                        }else{
-                            //点击操作
+                            nextPage(); //下一页
+                        }else{  //点击操作
                             //如果Y坐标在上1/3或者下1/3
-                            if(mCurPosY<maxHeight/3 || mCurPosY>maxHeight/3*2){
+                            if(mCurPosY < maxHeight / 3 || mCurPosY > maxHeight / 3 * 2){
                                 //如果X坐标在左边
-                                if(mCurPosX<maxWidth/2) lastPage(); //上一页
+                                if(mCurPosX < maxWidth / 2) lastPage(); //上一页
                                 //在右边
                                 else nextPage(); //下一页
                             }
                             //如果Y左边在中间
-                            else{
-//                                //X坐标在左1/3 和 右1/3
-//                                //左
-//                                if(mCurPosX<maxWidth/3) lastPage(); //上一页
-//                                //右
-//                                else if(mCurPosX>maxWidth/3*2) nextPage();
-//                                //中间
-//                                else{
-                                    //弹出
-                                    //如果是不显示状态
-                                    if(lin_menu.getVisibility() == View.INVISIBLE){
-                                        //显示状态栏
-                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                            else{   // 开启惨淡
+                                //显示状态栏
+                                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-                                        //显示整个菜单
-                                        lin_menu.setVisibility(View.VISIBLE);
-                                        //动画展开top
-                                        ObjectAnimator animator1 = ObjectAnimator.ofFloat(lin_top, "translationY", -200, 0);
-                                        animator1.setDuration(250);
-                                        animator1.start();
-                                        //动画展开bottom
-                                        ObjectAnimator animator2 = ObjectAnimator.ofFloat(lin_bottom, "translationY", 280, 0);
-                                        animator2.setDuration(250);
-                                        animator2.start();
-                                    }
-//                                }
+                                //显示整个菜单
+                                lin_menu.setVisibility(View.VISIBLE);
+                                //动画展开top
+                                ObjectAnimator animator1 = ObjectAnimator.ofFloat(lin_top, "translationY", -200, 0);
+                                animator1.setDuration(250);
+                                animator1.start();
+                                //动画展开bottom
+                                ObjectAnimator animator2 = ObjectAnimator.ofFloat(lin_bottom, "translationY", 280, 0);
+                                animator2.setDuration(250);
+                                animator2.start();
                             }
                         }
                         break;
@@ -292,7 +275,9 @@ public class ReadActivity extends AppCompatActivity {
     }
 
     //在主线程里面处理消息并更新UI界面
+    @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
+        @SuppressLint("HandlerLeak")
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -557,6 +542,7 @@ public class ReadActivity extends AppCompatActivity {
         }
     }
 
+    //设置背景图片
     private void setBackground(int num){
         switch (num){
             case 0:
@@ -682,7 +668,7 @@ public class ReadActivity extends AppCompatActivity {
     }
 
     //获得指定行的高度
-//    private int getLineHeight(int line,JustifyTextView view){
+//    private int getLineHeight(int line,TextView view){
 //        Rect rect = new Rect();
 //        view.getLineBounds(line,rect);
 //        return rect.bottom - rect.top;
@@ -702,7 +688,7 @@ public class ReadActivity extends AppCompatActivity {
     }
 
     //获得每页的最后一个字符的下标
-    private int[] getPage( JustifyTextView textView){
+    private int[] getPage(JustifyTextView textView){
         //获得总共多少行
         int count = textView.getLineCount();
         Log.d("fuck_dog",""+count);
@@ -755,6 +741,7 @@ public class ReadActivity extends AppCompatActivity {
     }
 
     //放置内容
+    @SuppressLint("SetTextI18n")
     private void setPage(){
         if(curPage>maxPage)curPage=maxPage;
         text.setText(everyStr[curPage]);

@@ -32,8 +32,6 @@ public class MyDataUtils {
     public static String settingsPath;
     public static String picSolerPath;
 
-
-
     /**检查创建书架文件夹*/
     public static void checkAndSetUpShelfSoler(){
         try {
@@ -253,4 +251,3 @@ public class MyDataUtils {
         Log.d("MyDataStorage","getBmList: 读取图片成功");
     }
 }
-

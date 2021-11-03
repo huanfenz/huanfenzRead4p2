@@ -65,11 +65,14 @@ public class JustifyTextView extends android.support.v7.widget.AppCompatTextView
             String line = text.substring(lineStart, lineEnd);
 
             //如果需要缩放，进行缩放，否则直接绘制
-            if (needScale(line)) {
-                drawScaledText(canvas, lineStart, line, width);
-            } else {
-                canvas.drawText(line, 0, mLineY, paint);
-            }
+//            if (needScale(line)) {
+//                drawScaledText(canvas, lineStart, line, width);
+//            } else {
+//                canvas.drawText(line, 0, mLineY, paint);
+//            }
+            // 老子不缩放了
+            canvas.drawText(line, 0, mLineY, paint);
+
             mLineY += textHeight;
         }
     }
