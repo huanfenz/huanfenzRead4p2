@@ -1,7 +1,9 @@
 package com.example.wangpeng.huanfenzread;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.annotation.Nullable;
@@ -24,11 +26,12 @@ public class FragLibraryActivity extends Fragment {
     private WebSettings settings;
     private LoadingView loading;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_frag_library,container,false);
 
-        webView = (WebView) view.findViewById(R.id.WebView);
+        webView = view.findViewById(R.id.WebView);
 
         //设置WebView属性，能够执行Javascript脚本
         settings = webView.getSettings();
@@ -45,12 +48,13 @@ public class FragLibraryActivity extends Fragment {
         //自适应屏幕
         settings.setUseWideViewPort(true); settings.setLoadWithOverviewMode(true);
         //自动缩放
-        settings.setBuiltInZoomControls(true); settings.setSupportZoom(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(false); // 不支持缩放
         //支持获取手势焦点
         webView.requestFocusFromTouch();
 
         //加载需要显示的网页
-        webView.loadUrl("https://m.88dushu.com/");
+        webView.loadUrl("http://192.168.0.41:5500/index.html");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageStarted(WebView view, String url, Bitmap favicon){
@@ -62,13 +66,11 @@ public class FragLibraryActivity extends Fragment {
             //覆盖shouldOverrideUrlLoading 方法
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-                String tmpStr = url;
-                int num = tmpStr.indexOf("info");
+                int num = url.indexOf("info");
                 //如果是目录页，那么进入介绍界面
                 if(num!=-1) {
                     //替换成PC端网页
-                    String booknum = MyTextDisposeUtils.mySubstring(tmpStr,"info/","/");
+                    String booknum = MyTextDisposeUtils.mySubstring(url,"info/","/");
                     String booknumst = booknum.substring(0,booknum.length()-3);
 
                     String data = "https://www.88dushu.com/xiaoshuo/"+ booknumst +"/"+ booknum +"/";
@@ -86,8 +88,6 @@ public class FragLibraryActivity extends Fragment {
             }
 
         });
-
-
 
         webView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
