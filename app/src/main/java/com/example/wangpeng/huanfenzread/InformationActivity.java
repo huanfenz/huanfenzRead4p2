@@ -17,6 +17,7 @@ import com.example.wangpeng.huanfenzread.view.LoadingView;
 import com.example.wangpeng.huanfenzread.view.MyImageView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +27,8 @@ import java.net.URL;
 import static com.example.wangpeng.huanfenzread.FragShelfActivity.shelfList;
 
 public class InformationActivity extends AppCompatActivity {
+
+    private static final String baseUrl = "https://www.x88du.com";
 
     private TextView tv_big_title,tv_title,tv_author,tv_updata_time,tv_description,tv_book_type;
     private MyImageView myImageView;
@@ -71,17 +74,15 @@ public class InformationActivity extends AppCompatActivity {
         loading.show();
 
         Intent intent = getIntent();
-        String data = intent.getStringExtra("book_information");
-        curAddr = data;
+        curAddr = intent.getStringExtra("book_information");
         Log.d("fuckdogdog",curAddr);
-
 
         shelfIndex = 9999;
         bt_addShelf.setText("加入书架");
         bt_addShelf.setEnabled(true);
         for (int i = 0 ; i<shelfList.size() ; i++) {
             String stmp = shelfList.get(i).catalogAddr;
-            if(curAddr.equals(stmp) == true){
+            if(curAddr.equals(stmp)){
                 shelfIndex = i;
                 bt_addShelf.setText("已加入");
                 bt_addShelf.setEnabled(false);
@@ -90,7 +91,9 @@ public class InformationActivity extends AppCompatActivity {
         httpGet();
     }
 
-    //暂停存数据
+    /**
+     * 暂停存数据
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -107,7 +110,7 @@ public class InformationActivity extends AppCompatActivity {
         myImageView.setDrawingCacheEnabled(false);
 
         String catalogAddr = curAddr;
-        String readAddr = curAddr + theAddr;
+        String readAddr = baseUrl + theAddr;
 
         MyShelfBook sb = new MyShelfBook(name,shelfList.size(),null,catalogAddr,readAddr,1,1);
         shelfList.add(sb);
@@ -126,7 +129,7 @@ public class InformationActivity extends AppCompatActivity {
         if(shelfIndex == 9999){
             MyDataUtils.curChapter = 1;
             MyDataUtils.curPage = 1;
-            intent.putExtra("read_url",curAddr + theAddr);
+            intent.putExtra("read_url",baseUrl + theAddr);
         }else{
             intent.putExtra("shelf_index",shelfIndex);
         }
@@ -135,11 +138,12 @@ public class InformationActivity extends AppCompatActivity {
     }
 
     public void ck_mulu(View view){
-        MyDataUtils.curChapter = shelfIndex==9999?1:shelfList.get(shelfIndex).curChapter;
-        MyDataUtils.curPage = shelfIndex==9999?1:shelfList.get(shelfIndex).curPage;
+        MyDataUtils.curChapter = shelfIndex==9999 ? 1 : shelfList.get(shelfIndex).curChapter;
+        MyDataUtils.curPage = shelfIndex==9999 ? 1 : shelfList.get(shelfIndex).curPage;
         MyDataUtils.catalog_mode = 0;
-        Intent intent = new Intent(InformationActivity.this,CatalogActivity.class);
         MyDataUtils.cunAddr = curAddr;
+        Log.d("Information, curAddr", curAddr);
+        Intent intent = new Intent(InformationActivity.this,CatalogActivity.class);
         startActivity(intent);
     }
 
@@ -147,13 +151,14 @@ public class InformationActivity extends AppCompatActivity {
         onBackPressed();
     }
 
+    /**
+     * 取第一章的地址
+     */
     private void catchCatalog(){
         //第一步截取
-        String all = MyTextDisposeUtils.mySubstring(webStr,"<ul>","</ul>");
-        //去掉收尾空
-        all.trim();
+        String all = MyTextDisposeUtils.mySubstring(webStr,"<ul>","</ul>").trim();
         //采集
-        theAddr = MyTextDisposeUtils.myStartSubstring(all,0,"<li><a href=\"","\">");
+        theAddr = MyTextDisposeUtils.mySubstring(all,"<a href=\"","\"");
     }
 
     public void httpGet() {
@@ -206,16 +211,15 @@ public class InformationActivity extends AppCompatActivity {
                 webStr = new String(response.getBytes());
 
                 surl = MyTextDisposeUtils.mySubstring(webStr,"image\" content=\"","\"");
-                Log.d("fuckdog",surl);
-                myImageView.setImageURL(surl,"https://www.88dush.com/");
-
+                myImageView.setImageURL(baseUrl + surl, null);
 
                 title = MyTextDisposeUtils.mySubstring(webStr,"book_name\" content=\"","\"");
                 author = MyTextDisposeUtils.mySubstring(webStr,"author\" content=\"","\"");
                 type = MyTextDisposeUtils.mySubstring(webStr,"category\" content=\"","\"");
 
                 utime = MyTextDisposeUtils.mySubstring(webStr,"update_time\" content=\"","\"");
-                des = MyTextDisposeUtils.mySubstring(webStr,"<div class=\"intro\">","</div>");
+                des = MyTextDisposeUtils.mySubstring(webStr,"description\" content=\"","\"");
+                des = des.replaceAll("&nbsp;", "");
 
                 tv_big_title.setText(title);
                 tv_title.setText(title);
@@ -224,6 +228,7 @@ public class InformationActivity extends AppCompatActivity {
                 tv_updata_time.setText("更新时间：" + utime);
                 tv_description.setText(des);
 
+                // 采集第一页的地址
                 catchCatalog();
 
                 loading.dismiss();

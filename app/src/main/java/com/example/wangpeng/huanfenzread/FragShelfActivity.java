@@ -164,6 +164,7 @@ public class FragShelfActivity extends Fragment {
         //从资源里找图片转成bitmap
         Resources res = getResources();
         Bitmap bmp = BitmapFactory.decodeResource(res, R.drawable.addpic);
+
         //增加“添加图书”图标和文字到map
         map=new HashMap<String,Object>();
         map.put("ItemImage",bmp);
@@ -224,7 +225,7 @@ public class FragShelfActivity extends Fragment {
         });
     }
 
-    private void showNormalDialog(final int i){
+    private void showNormalDialog(final int index){
         /* @setIcon 设置对话框图标
          * @setTitle 设置对话框标题
          * @setMessage 设置对话框消息提示
@@ -240,15 +241,15 @@ public class FragShelfActivity extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //...To-do
-                        MyShelfBook msb = shelfList.get(i);
-                        if(msb.mode==0 || msb.mode==1){
+                        MyShelfBook msb = shelfList.get(index);
+                        if(msb.mode == 0 || msb.mode == 1){
                             //如果有缓存路径，那么删除,并且删除文件夹
 //                            if(isHaveFile(msb.cachePath)){
 //                                deleteFile(new File(msb.cachePath),true);
 //                            }
                         }
-                        shelfList.remove(i);
-                        bmList.remove(i);
+                        shelfList.remove(index);
+                        bmList.remove(index);
                         gridViewEvent();
                         MyDataUtils.saveShelfInformation();
                         MyDataUtils.saveShelfAllPic();
@@ -265,15 +266,15 @@ public class FragShelfActivity extends Fragment {
         normalDialog.show();
     }
 
-    public void showList(int i){
+    public void showList(final int index){
         final String[] items = {"添加/修改封面", "从书架中删除书籍"};
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
         alertBuilder.setTitle("请选择操作");
         alertBuilder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if(i==1){
-                    showNormalDialog(i);
+                if(i == 1){
+                    showNormalDialog(index);
                 }
                 alertDialog1.dismiss();
             }

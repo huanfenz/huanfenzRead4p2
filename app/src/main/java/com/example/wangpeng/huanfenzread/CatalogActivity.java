@@ -29,6 +29,8 @@ import static com.example.wangpeng.huanfenzread.FragShelfActivity.shelfList;
 
 public class CatalogActivity extends AppCompatActivity {
 
+    private static final String baseUrl = "https://www.x88du.com";
+
     private ListView lv_catalog;
     private LoadingView loading;
 
@@ -95,6 +97,7 @@ public class CatalogActivity extends AppCompatActivity {
             }
         }).start();
 
+        // 选项点击事件
         lv_catalog.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -109,11 +112,11 @@ public class CatalogActivity extends AppCompatActivity {
                 }else{
                     if(MyDataUtils.catalog_mode == 0){
                         intent = new Intent(CatalogActivity.this,ReadActivity.class);
-                        intent.putExtra("read_url",curAddr +everyAddr[i]);
+                        intent.putExtra("read_url",baseUrl + everyAddr[i]);
                         startActivity(intent);
                     }else{
                         intent = new Intent();
-                        intent.putExtra("data_return",curAddr +everyAddr[i]);
+                        intent.putExtra("data_return",baseUrl + everyAddr[i]);
                         setResult(RESULT_OK,intent);
                         finish();
                     }
@@ -146,7 +149,7 @@ public class CatalogActivity extends AppCompatActivity {
         //第一步截取
         String all = MyTextDisposeUtils.mySubstring(webStr,"<ul>","</ul>");
         //去掉收尾空
-        all.trim();
+        all = all.trim();
 
         //<a href="36869968.html">第一章：不要放弃治疗</a>
         //<li><a href="51686783.html">第一章 穿越的肝帝</a></li>
@@ -170,12 +173,12 @@ public class CatalogActivity extends AppCompatActivity {
         //采集
         start = 0;
         for(int i=0;i<count;i++){
-            everyAddr[i] = MyTextDisposeUtils.myStartSubstring(all,start,"<li><a href=\"","\">");
-            everyStr[i] = everyStr[i] = MyTextDisposeUtils.myStartSubstring(all,start,everyAddr[i]+"\">","</a></li>");
-            if(i == MyDataUtils.curChapter-1){
+            everyAddr[i] = MyTextDisposeUtils.myStartSubstring(all,start,"<a href=\"","\"");
+            everyStr[i] = everyStr[i] = MyTextDisposeUtils.myStartSubstring(all, start,"title=\"","\"");
+            if(i == MyDataUtils.curChapter - 1){
                 everyStr[i] = everyStr[i] + " ✔";
             }
-            start = all.indexOf("</a></li>",start) + "</a></li>".length();
+            start = all.indexOf("</a> </li>", start) + "</a> </li>".length();
         }
     }
 
@@ -235,7 +238,7 @@ public class CatalogActivity extends AppCompatActivity {
 
                 int index = MyDataUtils.curChapter - 1;
 
-                lv_catalog.setSelection(index-6<0 ? 0 : index-6);
+                lv_catalog.setSelection(Math.max(index - 6, 0));
 
                 loading.dismiss();
             }

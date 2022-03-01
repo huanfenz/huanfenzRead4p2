@@ -54,7 +54,7 @@ public class FragLibraryActivity extends Fragment {
         webView.requestFocusFromTouch();
 
         //加载需要显示的网页
-        webView.loadUrl("http://192.168.0.41:5500/index.html");
+        webView.loadUrl("https://m.x88du.com/");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageStarted(WebView view, String url, Bitmap favicon){
@@ -66,16 +66,13 @@ public class FragLibraryActivity extends Fragment {
             //覆盖shouldOverrideUrlLoading 方法
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                int num = url.indexOf("info");
+                // 正则匹配
+                boolean flag = url.matches("https:\\/\\/m\\.x88du\\.com\\/\\d+_\\d+\\/");
+                //int num = url.indexOf("info");
                 //如果是目录页，那么进入介绍界面
-                if(num!=-1) {
+                if(flag) {
                     //替换成PC端网页
-                    String booknum = MyTextDisposeUtils.mySubstring(url,"info/","/");
-                    String booknumst = booknum.substring(0,booknum.length()-3);
-
-                    String data = "https://www.88dushu.com/xiaoshuo/"+ booknumst +"/"+ booknum +"/";
-
-                    Log.d("fuckdogdog",data);
+                    String data = url.replace("https://m.x88du.com/", "https://www.x88du.com/");
 
                     //存数据跳转
                     Intent intent = new Intent(getActivity(),InformationActivity.class);

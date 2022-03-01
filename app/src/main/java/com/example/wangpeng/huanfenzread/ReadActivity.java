@@ -44,6 +44,8 @@ import static com.example.wangpeng.huanfenzread.FragShelfActivity.shelfList;
 
 public class ReadActivity extends AppCompatActivity {
 
+    private static final String baseUrl = "https://www.x88du.com";
+
     //控件对象
     private JustifyTextView text;   // 阅读文本
     private TextView title,page,tv_fontSize,name,tv_time;   // 标题、页、字号、名字、时间
@@ -404,12 +406,12 @@ public class ReadActivity extends AppCompatActivity {
             //网络的
             if(readMode==1||readMode==2) {
                 //获得上一章的url
-                String url = MyTextDisposeUtils.mySubstring2(webStr,"<a href=\"","\" target=\"_top\">← 上一章");
+                String url = MyTextDisposeUtils.mySubstring2(webStr,"<a href=\"","\" target=_top><< 上一章");
                 //正则匹配，是否是阅读页url
-                boolean isRead = Pattern.matches("\\d{8}.html",url);
+                boolean isRead = Pattern.matches(".+\\d{8}.html",url);
                 //是阅读页，那么处理加载
                 if(isRead){
-                    url = catalogAddr + url;
+                    url = baseUrl + url;
                     MyDataUtils.curChapter--;
                     if(readMode==1){
                         shelfList.get(shelfIndex).curChapter = MyDataUtils.curChapter;
@@ -447,12 +449,12 @@ public class ReadActivity extends AppCompatActivity {
             //网络
             if(readMode==1||readMode==2){
                 //获得下一章的url
-                String url = MyTextDisposeUtils.mySubstring2(webStr,"<a href=\"","\" target=\"_top\">下一章");
+                String url = MyTextDisposeUtils.mySubstring2(webStr,"<a href=\"","\" target=_top>下一章");
                 //正则匹配，是否是阅读页url
-                boolean isRead = Pattern.matches("\\d{8}.html",url);
+                boolean isRead = Pattern.matches(".+\\d{8}.html",url);
                 //是阅读页，那么处理加载
                 if(isRead){
-                    url = catalogAddr + url;
+                    url = baseUrl + url;
                     Log.d("fuckdog",url);
                     MyDataUtils.curChapter++;
                     if(readMode==1){
@@ -596,6 +598,8 @@ public class ReadActivity extends AppCompatActivity {
             case 1:{
                 if(resultCode == RESULT_OK){
                     lin_menu.setVisibility(View.INVISIBLE);
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN); //隐藏状态栏
+
                     if(readMode==0){
                         int num = data.getIntExtra("index_return",1);//从目录页返回的数据
                         shelfList.get(shelfIndex).curChapter = num;
@@ -603,11 +607,13 @@ public class ReadActivity extends AppCompatActivity {
                         shelfList.get(shelfIndex).renewReadPath();
                         String curPath = shelfList.get(shelfIndex).readPath;
                         setNewPathAndGo(curPath,30,1);
-                    }else if(readMode==1){
+                    }else if(readMode == 1 || readMode == 2){
                         String str = data.getStringExtra("data_return");//从目录页返回的数据
-                        shelfList.get(shelfIndex).curChapter = MyDataUtils.curChapter;
-                        shelfList.get(shelfIndex).curPage = 1;
-                        shelfList.get(shelfIndex).readAddr = str;
+                        if (shelfIndex != 9999) {
+                            shelfList.get(shelfIndex).curChapter = MyDataUtils.curChapter;
+                            shelfList.get(shelfIndex).curPage = 1;
+                            shelfList.get(shelfIndex).readAddr = str;
+                        }
                         setCurAddrAndGo(str,0,1);
                     }
                 }
