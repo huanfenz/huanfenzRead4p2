@@ -8,7 +8,7 @@
 
 APP
 
-演示视频地址：[演示视频](https://huanfenz.top/web/showapp/)
+演示视频地址：[演示视频](http://huanfenz.top/archives/showapp)
 
 APP下载地址：[下载地址](http://wangpeng-imgsubmit.oss-cn-hangzhou.aliyuncs.com/img/202203011125813.apk)
 
