@@ -6,12 +6,6 @@
 
 基于Android的本地电子书阅读器，实现了书架管理、电子书的导入与阅读、阅读界面个性化设置等功能。
 
-APP
-
-演示视频地址：[演示视频](http://huanfenz.top/archives/showapp)
-
-APP下载地址：[下载地址](http://wangpeng-imgsubmit.oss-cn-hangzhou.aliyuncs.com/img/202203011125813.apk)
-
 ## 环境介绍
 
 Android版本：
@@ -28,11 +22,13 @@ Android版本：
 
 书架界面
 
-![image-1](http://wangpeng-imgsubmit.oss-cn-hangzhou.aliyuncs.com/img/202202250914223.png)
+![a1](https://github.com/huanfenz/huanfenzRead4p2/assets/49386166/c47b60d9-1b85-4d27-a866-1734b8a588ee)
+
 
 阅读界面
 
-![image-2](http://wangpeng-imgsubmit.oss-cn-hangzhou.aliyuncs.com/img/202202250915625.png)
+![a2](https://github.com/huanfenz/huanfenzRead4p2/assets/49386166/2f8d2865-166f-4943-8bca-ce16ec41bd17)
+
 
 更多功能就自己看吧！:smile:
 
